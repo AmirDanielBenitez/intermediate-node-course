@@ -14,6 +14,25 @@ app.listen(port, () => {
   console.log(`server is listening on port:${port}`)
 })
 
+function sendResponse(res, err, data) {
+  if (err) {
+    res.json({
+      success: false,
+      message: err
+    })
+  } else if (!data) {
+    res.json({
+      success: false,
+      message: "Not Found"
+    })
+  } else {
+    res.json({
+      success: true,
+      data: data
+    })
+  }
+}
+
 // CREATE
 app.post('/users', (req, res) => {
   User.create({
@@ -22,22 +41,7 @@ app.post('/users', (req, res) => {
     password: req.body.newData.password,
   },
     (err, data) => {
-      if (err) {
-        res.json({
-          success: false,
-          message: err
-        })
-      } else if (!data) {
-        res.json({
-          success: false,
-          message: "Not Found"
-        })
-      } else {
-        res.json({
-          success: true,
-          data: data
-        })
-      }
+      sendResponse(res, err, data)
     }
   )
 })
@@ -46,22 +50,7 @@ app.route('/users/:id')
   // READ
   .get((req, res) => {
     User.findById(req.params.id, (err, data) => {
-      if (err) {
-        res.json({
-          success: false,
-          message: err
-        })
-      } else if (!data) {
-        res.json({
-          success: false,
-          message: "Not Found"
-        })
-      } else {
-        res.json({
-          success: true,
-          message: data
-        })
-      }
+      sendResponse(res, err, data)
     })
   })
   // UPDATE
@@ -69,30 +58,13 @@ app.route('/users/:id')
     User.findByIdAndUpdate(
       req.params.id,
       {
-        name: req.body.newData.name,
-        email: req.body.newData.email,
-        password: req.body.newData.password,
+        ...req.body.newData.name,
       },
       {
         new: true
       },
       (err, data) => {
-        if (err) {
-          res.json({
-            success: false,
-            message: err
-          })
-        } else if (!data) {
-          res.json({
-            success: false,
-            message: "Not Found"
-          })
-        } else {
-          res.json({
-            success: true,
-            data: data
-          })
-        }
+        sendResponse(res, err, data)
       }
     )
   })
@@ -101,22 +73,7 @@ app.route('/users/:id')
     User.findByIdAndDelete(
       req.params.id,
       (err, data) => {
-        if (err) {
-          res.json({
-            success: false,
-            message: err
-          })
-        } else if (!data) {
-          res.json({
-            success: false,
-            message: "Not Found"
-          })
-        } else {
-          res.json({
-            success: true,
-            data: data
-          })
-        }
+        sendResponse(res, err, data)
       }
     )
   })
